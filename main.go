@@ -20,6 +20,9 @@ import (
 //            = [cos(x) * cos(x) - (-sin(x)) * sin(x)] / cos^2(x)
 //            = sec^2(x)
 
+// d/dx log_a(x) = 1 / (x * ln(a))
+// d/dx ln(x) = 1 / x
+
 func main() {
 	sinX := func(x float64) float64 {
 		return math.Sin(x)
@@ -32,9 +35,31 @@ func main() {
 	}
 	sec2X := differentiateTrigFunction(tanX, 0.5)
 	fmt.Printf("tan(0.5)의 도함수는 %.4f입니다.\n", sec2X)
+
+	logX := func(x float64) float64 {
+		return math.Log2(x)
+	}
+	dLogX := differentiateLogFunction(logX, 10, 2)
+	fmt.Printf("log_2(10)의 도함수는 %.4f입니다.\n", dLogX)
+
+	lnX := func(x float64) float64 {
+		return math.Log(x)
+	}
+	dLnX := differentiateLnFunction(lnX, 3)
+	fmt.Printf("ln(3)의 도함수는 %.4f입니다.\n", dLnX)
 }
 
 func differentiateTrigFunction(f func(x float64) float64, x float64) float64 {
 	h := 0.00000001
 	return (f(x+h) - f(x)) / h
+}
+
+func differentiateLogFunction(f func(x float64) float64, x float64, a float64) float64 {
+	h := 0.00000001
+	return 1 / (x*math.Log(a) + h)
+}
+
+func differentiateLnFunction(f func(x float64) float64, x float64) float64 {
+	h := 0.00000001
+	return 1 / (x + h)
 }
