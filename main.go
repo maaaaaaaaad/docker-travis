@@ -1,54 +1,63 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
-func generateParenthesis(n int) []string {
-	var result []string
-	var generate func(left, right int, str string)
-	generate = func(left, right int, str string) {
-		if left == 0 && right == 0 {
-			result = append(result, str)
-			return
-		}
-		if left > 0 {
-			generate(left-1, right+1, str+"(")
-		}
-		if right > 0 {
-			generate(left, right-1, str+")")
-		}
-	}
-
-	generate(n, 0, "")
-
-	return result
+type Graph struct {
+	vertices []*Vertex
 }
 
-func solution(n int) int {
-	count := 0
-	for _, s := range generateParenthesis(n) {
-		if isValid(s) {
-			count++
-		}
-	}
-	return count
+type Vertex struct {
+	key      int
+	adjacent []*Vertex
+	visited  bool
 }
 
-func isValid(s string) bool {
-	stack := []rune{}
-	for _, c := range s {
-		if c == '(' {
-			stack = append(stack, c)
-		} else if len(stack) > 0 && stack[len(stack)-1] == '(' {
-			stack = stack[:len(stack)-1]
-		} else {
-			return false
+func NewVertex(key int) *Vertex {
+	return &Vertex{
+		key:      key,
+		adjacent: []*Vertex{},
+	}
+}
+
+func (g *Graph) AddVertex(v *Vertex) {
+	g.vertices = append(g.vertices, v)
+}
+
+func (g *Graph) AddEdge(v1, v2 *Vertex) {
+	v1.adjacent = append(v1.adjacent, v2)
+	v2.adjacent = append(v2.adjacent, v1)
+}
+
+func (g *Graph) DFS(v *Vertex) {
+	v.visited = true
+	fmt.Printf("Visited vertex: %d\n", v.key)
+
+	for _, adjacent := range v.adjacent {
+		if !adjacent.visited {
+			g.DFS(adjacent)
 		}
 	}
-	return len(stack) == 0
 }
 
 func main() {
-	n := 3
-	result := solution(n)
-	fmt.Printf("%v result: %v", n, result)
+	g := &Graph{}
+
+	vertices := []*Vertex{}
+	for i := 0; i < 8; i++ {
+		vertex := NewVertex(i)
+		vertices = append(vertices, vertex)
+		g.AddVertex(vertex)
+	}
+
+	g.AddEdge(vertices[0], vertices[1])
+	g.AddEdge(vertices[0], vertices[2])
+	g.AddEdge(vertices[1], vertices[3])
+	g.AddEdge(vertices[1], vertices[4])
+	g.AddEdge(vertices[2], vertices[5])
+	g.AddEdge(vertices[2], vertices[6])
+	g.AddEdge(vertices[3], vertices[7])
+
+	g.DFS(vertices[0])
 }
