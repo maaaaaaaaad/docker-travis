@@ -1,63 +1,33 @@
-package main
-
-import (
-	"fmt"
-)
-
-type Graph struct {
-	vertices []*Vertex
-}
-
-type Vertex struct {
-	key      int
-	adjacent []*Vertex
-	visited  bool
-}
-
-func NewVertex(key int) *Vertex {
-	return &Vertex{
-		key:      key,
-		adjacent: []*Vertex{},
-	}
-}
-
-func (g *Graph) AddVertex(v *Vertex) {
-	g.vertices = append(g.vertices, v)
-}
-
-func (g *Graph) AddEdge(v1, v2 *Vertex) {
-	v1.adjacent = append(v1.adjacent, v2)
-	v2.adjacent = append(v2.adjacent, v1)
-}
-
-func (g *Graph) DFS(v *Vertex) {
-	v.visited = true
-	fmt.Printf("Visited vertex: %d\n", v.key)
-
-	for _, adjacent := range v.adjacent {
-		if !adjacent.visited {
-			g.DFS(adjacent)
+func solution(e int, starts []int) []int {
+	freq := make([]int, e+1)
+	for i := 1; i <= e; i++ {
+		for j := i; j <= e; j += i {
+			freq[j]++
 		}
 	}
-}
-
-func main() {
-	g := &Graph{}
-
-	vertices := []*Vertex{}
-	for i := 0; i < 8; i++ {
-		vertex := NewVertex(i)
-		vertices = append(vertices, vertex)
-		g.AddVertex(vertex)
+	maxNum := make([]int, e+1)
+	maxFreq := freq[1]
+	maxNum[1] = 1
+	for i := 2; i <= e; i++ {
+		if freq[i] >= maxFreq {
+			maxFreq = freq[i]
+			maxNum[i] = i
+		} else {
+			maxNum[i] = maxNum[i-1]
+		}
+	}
+	result := make([]int, len(starts))
+	for i, start := range starts {
+		maxFreqInRange := freq[start]
+		maxNumInRange := start
+		for j := start; j <= e; j++ {
+			if freq[j] > maxFreqInRange {
+				maxFreqInRange = freq[j]
+				maxNumInRange = j
+			}
+		}
+		result[i] = maxNumInRange
 	}
 
-	g.AddEdge(vertices[0], vertices[1])
-	g.AddEdge(vertices[0], vertices[2])
-	g.AddEdge(vertices[1], vertices[3])
-	g.AddEdge(vertices[1], vertices[4])
-	g.AddEdge(vertices[2], vertices[5])
-	g.AddEdge(vertices[2], vertices[6])
-	g.AddEdge(vertices[3], vertices[7])
-
-	g.DFS(vertices[0])
+	return result
 }
