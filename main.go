@@ -20,7 +20,11 @@ func solution(e int, starts []int) []int {
 
 	result := make([]int, len(starts))
 	for i, start := range starts {
-		result[i] = maxNum[start]
+		if start == 1 {
+			result[i] = maxNum[e]
+		} else {
+			result[i] = maxNum[e] - maxNum[start-1]
+		}
 	}
 
 	return result
